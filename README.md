@@ -1,9 +1,6 @@
 # Math Games
 These are some mathematical games that I wrote. Most of them I invented myself.
 
-## Days
-`days.py` is a game that teaches you how to calculate the day of the year. It gives you a random date, you enter what day of the week that was, and it keeps track of how many you get right. If you ask it for help, it will give you a formula to use for the calculation.
-
 ## Geek of All Trades
 
 ![Gameboard](https://i.imgur.com/AujrAly.png "Gameboard")
@@ -12,19 +9,20 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 Sample play:
 
-> How many digit numbers do you want to work with to solve math.factorial(x)? `1`
-> Solve math.factorial(9) : `362880`
-> That's right! Now turn the numbers into letters into a word. 
-> 2 for length 6
-> Select a language: de, ελ, en, es, fi, it, hu, мк, pl, ro, sk, sr, or other: `hu`
-> Enter a word that matches the digits in your answer, or the starting digits.
-> The digits must be in order: `masnivá`
-> Points for m
-> Points for s
-> Points for n
-> Points for v
-> Progress: 3 of 5
-
+```
+How many digit numbers do you want to work with to solve math.factorial(x)? 1
+Solve math.factorial(9) : 362880
+That's right! Now turn the numbers into letters into a word. 
+2 for length 6
+Select a language: de, ελ, en, es, fi, it, hu, мк, pl, ro, sk, sr, or other: hu
+Enter a word that matches the digits in your answer, or the starting digits.
+The digits must be in order: masnivá
+Points for m
+Points for s
+Points for n
+Points for v
+Progress: 3 of 5
+```
 
 ## Number Rules
 `numberules.py` is a fun twist on "guess the number". Instead of guessing a number, you're given 3 numbers from a sequence of numbers and you have to try to guess the sequence. If you supply 5 numbers from the hidden sequences before you guess 10 numbers that are not in the sequence, you win. This is a fair ratio, because some of the sequences are quite difficult and there are a lot of possibilities.
@@ -32,21 +30,28 @@ Sample play:
 Sample play:
 
 Start with three numbers:
-> Guesses remaining:  10
-> Correct answers:  0
-> Included: [512, 5832, 64]
+```
+Guesses remaining:  10
+Correct answers:  0
+Included: [512, 5832, 64]
+```
 
 After guessing a few wrong numbers, `16` and `25` and a few right numbers like `1` and `8` I figured it was probably perfect cubes and filled in some more numbers:
 
-> Guesses remaining:  8
-> Correct answers:  4
-> Included: [512, 5832, 64, 1, 8, 125, 216]
-> Excluded: [16, 25]
-> Guess a number that matches these numbers: `729`
-> You win!
-> Rule: Perfect cubes are numbers that are multiplied by themselves three times, like
-> 5×5×5 = 125
-> Do you want to play again? Y/n 
+```
+Guesses remaining:  8
+Correct answers:  4
+Included: [512, 5832, 64, 1, 8, 125, 216]
+Excluded: [16, 25]
+Guess a number that matches these numbers: `729`
+You win!
+Rule: Perfect cubes are numbers that are multiplied by themselves three times, like
+5×5×5 = 125
+Do you want to play again? Y/n 
+```
+
+## Days
+`days.py` is a game that teaches you how to calculate the day of the year. It gives you a random date, you enter what day of the week that was, and it keeps track of how many you get right. If you ask it for help, it will give you a formula to use for the calculation.
 
 
 ## Mastermind
