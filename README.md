@@ -36,14 +36,14 @@ Correct answers:  0
 Included: [512, 5832, 64]
 ```
 
-After guessing a few wrong numbers, `16` and `25` and a few right numbers like `1` and `8` I figured it was probably perfect cubes and filled in some more numbers:
+After guessing a few wrong numbers, `16` and `25`, and a few right numbers like `1` and `8`, I figured it was probably perfect cubes and filled in some more numbers:
 
 ```
 Guesses remaining:  8
 Correct answers:  4
 Included: [512, 5832, 64, 1, 8, 125, 216]
 Excluded: [16, 25]
-Guess a number that matches these numbers: `729`
+Guess a number that matches these numbers: 729
 You win!
 Rule: Perfect cubes are numbers that are multiplied by themselves three times, like
 5×5×5 = 125
