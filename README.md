@@ -55,4 +55,4 @@ Do you want to play again? Y/n
 
 
 ## Mastermind
-`mastermind.py` is not my invention. [Mastermind](https://en.wikipedia.org/wiki/Mastermind_(board_game)) is a famous board game. The computer thinks of an n-digit number, which you must guess. After each guess, the computer tells you how many digits were correct and how many were in the right position. 
+`mastermind.py` is not my invention, I just coded it up. [Mastermind](https://en.wikipedia.org/wiki/Mastermind_(board_game)) is a famous board game. The computer thinks of an n-digit number, which you must guess. After each guess, the computer tells you how many digits were correct and how many were in the right position. 
