@@ -7,7 +7,14 @@ import readline
 input('Press enter when you\'re ready to begin typing, then press enter again when you\'re done.')
 start = time.time()
 
-text = input('Go: ')
+text = ''
+while True:
+    newtext = input('Go: ')
+    if newtext: # adds a space to make up for not capturing the enter key
+        text = text + ' ' + newtext
+        nexttext = ''
+    else:
+        break
 
 end = time.time()
 
