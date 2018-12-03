@@ -50,6 +50,14 @@ Rule: Perfect cubes are numbers that are multiplied by themselves three times, l
 Do you want to play again? Y/n 
 ```
 
+## Typing
+`typing.py` is a very simple typing test. You can type whatever you want and it will tell you:
+* How many characters you typed
+* In how many seconds
+* Your typing speed in CPM (characters per minute)
+* Your typing speed in WPM (words per minute), which is [defined at 5 characters/word](https://en.wikipedia.org/wiki/Words_per_minute).
+
+
 ## Days
 `days.py` is a game that teaches you how to calculate the day of the year. It gives you a random date, you enter what day of the week that was, and it keeps track of how many you get right. If you ask it for help, it will give you a formula to use for the calculation.
 
