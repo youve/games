@@ -17,7 +17,7 @@ def typeOwn():
             break
     end = time.time()
     errors = []
-    return text.strip(), errors, end - start
+    return text.strip(), errors, round(end - start)
 
 
 def typeFortune():
@@ -32,7 +32,7 @@ def typeFortune():
     text, errors, seconds = typeOwn()
     text = text.split('\n') #do it line by line so a single error early on doesn't throw it all out
     while len(text) < len(fortune): #line things up
-        text = text.append('\n')
+        text.append('\n')
     for i, line in enumerate(fortune):
         while len(text[i]) < len(fortune[i]): #line things up
             text[i] = text[i] + " "
@@ -51,8 +51,26 @@ if input('Type your [O]wn text or an [A]ssigned one? ').upper() == 'O':
 else:
     text, errors, seconds = typeFortune()
 
-print(f'You typed {len(text)} characters in {round(seconds)} seconds. {round(len(text)*60/(seconds))} CPM or {round(len(text)*60/5/(seconds))} WPM. You made {len(errors)} errors: ')
+colWidth = 1
+characters = str(len(text))
+CPM = str(round(len(text)*60/(seconds)))
+WPM = str(round(len(text)*60/5/(seconds)))
+errorRate = str(round(100 - 100*(len(text)-len(errors))/len(text),2))
+errorCount = str(len(errors))
+ACPM = str(round((len(text) - len(errors))*60/seconds))
+AWPM = str(round((len(text) - len(errors))*60/5/seconds))
+seconds = str(seconds)
+
+for item in (characters, seconds, CPM, WPM, errorRate, errorCount, ACPM, AWPM):
+    if len(item) > colWidth:
+        colWidth = len(item) + 2
+
+print(f'Errors: {errorCount}:')
 for error in errors:
     print(error,'\n')
+
+print('Statistics:')
+print(f'Characters: {characters.rjust(colWidth)}\tSeconds: {seconds.rjust(colWidth)}\tCPM:  {CPM.rjust(colWidth)}\tWPM:  {WPM.rjust(colWidth)}')
+print(f'Error rate: {errorRate.rjust(colWidth)}%\tErrors:  {errorCount.rjust(colWidth)}\tACPM: {ACPM.rjust(colWidth)}\tAWPM: {AWPM.rjust(colWidth)}')
 
 #todo: adjusted WPM/CPM for errors
