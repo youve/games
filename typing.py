@@ -4,35 +4,36 @@
 import time
 import readline
 import subprocess
+import sys
+import argparse
 
-def typeOwn():
-    text = ''
+parser = argparse.ArgumentParser(description='Take a typing test.')
+parser.add_argument('-f', '--fortune', type=str, help="Args to pass onto fortune. default: s", 
+    default='s', nargs='*')
+args = parser.parse_args()
+
+def typeOwn(paragraphs=1):
+    text = []
     start = time.time()
-    while True:
-        newtext = input('').strip()
-        if newtext: # reinsert new lines
-            text = text + '\n' + newtext
-            nexttext = ''
-        else:
-            break
+    while len(text) < paragraphs:
+        text.append(sys.stdin.readline().strip())
     end = time.time()
+    text = '\n'.join(text)
     errors = []
-    return text.strip(), errors, round(end - start)
+    return text, errors, round(end - start)
 
 
 def typeFortune():
     '''Get a short fortune for the user to type, and then check that what they typed matches it'''
-    fortune = subprocess.getoutput('/usr/bin/fortune -s')
+    fortune = subprocess.getoutput('/usr/bin/fortune ' + '-' + ' '.join(args.fortune))
     fortune = fortune.split('\n')
     print('\n')
     for i, line in enumerate(fortune): # get rid of white space
         fortune[i] = line.strip()
         print(line)
     print('\n')
-    text, errors, seconds = typeOwn()
+    text, errors, seconds = typeOwn(len(fortune))
     text = text.split('\n') #do it line by line so a single error early on doesn't throw it all out
-    while len(text) < len(fortune): #line things up
-        text.append('\n')
     for i, line in enumerate(fortune):
         while len(text[i]) < len(fortune[i]): #line things up
             text[i] = text[i] + " "
@@ -49,7 +50,7 @@ def typeFortune():
     text = '\n'.join(text) 
     return text, errors, seconds
     
-if input('Type your [O]wn text or an [A]ssigned one? ').upper() == 'O':
+if input('Type your [O]wn text or a [F]ortune cookie? ').upper() == 'O':
     text, errors, seconds = typeOwn()
 else:
     text, errors, seconds = typeFortune()
@@ -71,7 +72,7 @@ for item in (characters, seconds, CPM, WPM, errorRate, errorCount, ACPM, AWPM):
         colWidth = len(item) + 2
 
 #Print errors
-print(f'Errors: {errorCount}:')
+print(f'\nErrors: {errorCount}')
 for error in errors:
     print(error,'\n')
 
