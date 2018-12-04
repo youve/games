@@ -50,13 +50,23 @@ Rule: Perfect cubes are numbers that are multiplied by themselves three times, l
 Do you want to play again? Y/n 
 ```
 
-## Typing
-`typing.py` is a very simple typing test. You can type whatever you want and it will tell you:
+## Typing Games
+`typing.py` is a simple typing test. It has two modes. 
+
+### Own text mode
+In Own text mode, you can type whatever you want and it will tell you:
 * How many characters you typed
 * In how many seconds
 * Your typing speed in CPM (characters per minute)
 * Your typing speed in WPM (words per minute), which is [defined at 5 characters/word](https://en.wikipedia.org/wiki/Words_per_minute).
 
+### Fortune mode
+In Fortune mode, you are given a short fortune to type, from the unix program `fortune -s`. This is a port of the game `typefortune` which I used to play on Debian a long time ago but seems to be missing from Arch's respositories. In addition to the information from Own text mode, you will learn:
+* How many errors you made
+* What those errors were
+* Your error rate percentage
+* Your typing speed in ACPM (accurate characters per minute)
+* Your typing speed in AWPM (accurate words per minute)
 
 ## Days
 `days.py` is a game that teaches you how to calculate the day of the year. It gives you a random date, you enter what day of the week that was, and it keeps track of how many you get right. If you ask it for help, it will give you a formula to use for the calculation.
