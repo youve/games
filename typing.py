@@ -16,7 +16,7 @@ def typeOwn():
         else:
             break
     end = time.time()
-    errors = 0
+    errors = []
     return text.strip(), errors, end - start
 
 
@@ -38,7 +38,11 @@ def typeFortune():
             text[i] = text[i] + " "
         for j in range(len(fortune[i])):
             if fortune[i][j] != text[i][j]:
-                errors += 1
+                mistake = [fortune[i][j-5:j+5] + '\n']
+                mistake.append(text[i][j-5:j])
+                mistake.append('\033[1m' + text[i][j] + '\033[0m')
+                mistake.append(text[i][j+1:j+5])
+                errors.append(''.join(mistake))
     text = '\n'.join(text) 
     return text, errors, seconds
     
@@ -47,6 +51,8 @@ if input('Type your [O]wn text or an [A]ssigned one? ').upper() == 'O':
 else:
     text, errors, seconds = typeFortune()
 
-print(f'You typed {len(text)} characters in {round(seconds)} seconds. {round(len(text)*60/(seconds))} CPM or {round(len(text)*60/5/(seconds))} WPM. You made {errors} errors. ')
+print(f'You typed {len(text)} characters in {round(seconds)} seconds. {round(len(text)*60/(seconds))} CPM or {round(len(text)*60/5/(seconds))} WPM. You made {len(errors)} errors: ')
+for error in errors:
+    print(error,'\n')
 
 #todo: adjusted WPM/CPM for errors
