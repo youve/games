@@ -20,7 +20,7 @@ def typeOwn(paragraphs=1):
     end = time.time()
     text = '\n'.join(text)
     errors = []
-    return text, errors, round(end - start)
+    return text, errors, end - start
 
 
 def typeFortune():
@@ -64,7 +64,7 @@ errorRate = str(round(100 - 100*(len(text)-len(errors))/len(text),2))
 errorCount = str(len(errors))
 ACPM = str(round((len(text) - len(errors))*60/seconds))
 AWPM = str(round((len(text) - len(errors))*60/5/seconds))
-seconds = str(seconds)
+seconds = str(round(seconds))
 
 # align columns
 for item in (characters, seconds, CPM, WPM, errorRate, errorCount, ACPM, AWPM):
