@@ -57,14 +57,15 @@ else:
 
 #get stats ready for printing
 colWidth = 1
-characters = str(len(text))
-CPM = str(round(len(text)*60/(seconds)))
-WPM = str(round(len(text)*60/5/(seconds)))
-errorRate = str(round(100 - 100*(len(text)-len(errors))/len(text),2))
+characters = len(text)
+CPM = str(round(characters)*60/(seconds)))
+WPM = str(round(characters)*60/5/(seconds)))
+errorRate = str(round(100 - 100*(characters)-len(errors))/characters),2))
 errorCount = str(len(errors))
-ACPM = str(round((len(text) - len(errors))*60/seconds))
-AWPM = str(round((len(text) - len(errors))*60/5/seconds))
+ACPM = str(round((characters) - len(errors))*60/seconds))
+AWPM = str(round((characters) - len(errors))*60/5/seconds))
 seconds = str(round(seconds))
+characters = str(characters)
 
 # align columns
 for item in (characters, seconds, CPM, WPM, errorRate, errorCount, ACPM, AWPM):
