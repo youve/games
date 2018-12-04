@@ -78,4 +78,5 @@ for error in errors:
 #Print stats
 print('Statistics:')
 print(f'Characters: {characters.rjust(colWidth)}\tSeconds: {seconds.rjust(colWidth)}\tCPM:  {CPM.rjust(colWidth)}\tWPM:  {WPM.rjust(colWidth)}')
-print(f'Error rate: {errorRate.rjust(colWidth)}%\tErrors:  {errorCount.rjust(colWidth)}\tACPM: {ACPM.rjust(colWidth)}\tAWPM: {AWPM.rjust(colWidth)}')
+if errors:
+    print(f'Error rate: {errorRate.rjust(colWidth)}%\tErrors:  {errorCount.rjust(colWidth)}\tACPM: {ACPM.rjust(colWidth)}\tAWPM: {AWPM.rjust(colWidth)}')
