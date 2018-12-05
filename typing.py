@@ -58,12 +58,12 @@ else:
 #get stats ready for printing
 colWidth = 1
 characters = len(text)
-CPM = str(round(characters)*60/(seconds)))
-WPM = str(round(characters)*60/5/(seconds)))
-errorRate = str(round(100 - 100*(characters)-len(errors))/characters),2))
+CPM = str(round(characters)*60/(seconds))
+WPM = str(round(characters)*60/5/(seconds))
+errorRate = str(round(100 - 100*characters-len(errors)/characters,2))
 errorCount = str(len(errors))
-ACPM = str(round((characters) - len(errors))*60/seconds))
-AWPM = str(round((characters) - len(errors))*60/5/seconds))
+ACPM = str(round((characters) - len(errors)*60/seconds))
+AWPM = str(round((characters) - len(errors)*60/5/seconds))
 seconds = str(round(seconds))
 characters = str(characters)
 
