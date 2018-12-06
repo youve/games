@@ -8,8 +8,9 @@ from PIL import ImageColor
 from PIL import Image
 import argparse
 import time
+import math
 import logging
-logging.disable()
+#logging.disable()
 logging.basicConfig(level=logging.DEBUG, format='%(lineno)s - %(asctime)s - %(levelname)s - %(message)s')
 
 
@@ -28,32 +29,34 @@ def ulam(size):
     '''Starting in the center and going in an anti-clockwise spiral, colour prime pixels with 
     the foreground colour. '''
     im = Image.new('RGBA', (size,size), args.background)
-    print(f'Finding all primes below {size}^2 = {size**2} to put onto the image. This may take a while.')
+    #print(f'Finding all primes below {size}^2 = {size**2} to put onto the image. This may take a while.')
     start = time.time()
-    primes = prime(size**2)
-    end = time.time()
-    print(f'Got {len(primes)} primes in {round(end - start, 2)} seconds.')
+    #primes = prime(size**2)
+    #end = time.time()
+    #print(f'Got {len(primes)} primes in {round(end - start, 2)} seconds.')
     directions = ['D', 'L', 'U', 'R']  # backwards so we can use negative indices to wrap around
     direction = 'R'
     count = 0
     sidelength = 1
     x, y = size//2, size//2
     if size%2 == 0:
-        x, y == size/2 -1, size/2
+        x, y = int(size/2 -1), int(size/2)
     print('Making image: ')
     start = time.time()
     for i in range(1,size**2):
         if i > 1 and i in range(1,size**2,size**2//20):
             percentDone = 100*i/size**2
             timeElapsed = time.time() - start
-            logging.debug(f'percentDone: {percentDone}\ttimeElapsed: {timeElapsed}\t')
+            logging.debug(f'percentDone: {round(percentDone,2)}\ttimeElapsed: {round(timeElapsed,2)}\t')
             print(f'{round(percentDone)}% done. ETA in {round(timeElapsed*(100-percentDone)/percentDone)} seconds.')
-        if i in primes:
-            try:
-                im.putpixel((x, y), foreground)
-            except:
-                #im.save(args.file)
-                break
+        f = factors(i)
+        if f == 2:
+            im.putpixel((x, y), foreground)
+        else:
+            if ImageColor.getcolor(args.background, 'L') >= 128: # bright background gets darker when more composite
+                im.putpixel((x, y), (round(3/f*(background[0])), round(3/f*(background[1])), round(3/f*(background[2]))))
+            else: #darker background gets brighter when more composite, not done tweaking yet
+                im.putpixel((x, y), (round(f/3*(background[0])), round(f/3*(background[1])), round(f/3*(background[2]))))
         count +=1
         if direction == 'R':
             x = x+1
@@ -83,6 +86,14 @@ def prime(max):
         if not composite:
             primes.append(i)
     return primes
+
+def factors(n):
+    '''return the number of factors a number has'''
+    factors = 1
+    for i in range(1,n//2+1):
+        if n%i == 0:
+            factors += 1
+    return factors
 
 modes={'xor' : xor, 'ulam' : ulam}
 
