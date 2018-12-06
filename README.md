@@ -5,7 +5,7 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 `mathspictures.py` can create mathematical images like these:
 
-`./mathsPictures.py ulam ulam.png -f 'gold' -b '#006'`
+`./mathsPictures.py ulam ulam.png -f 'skyblue' -b 'blue'`
 
 ![Ulam spiral](./ulam.png)
 
