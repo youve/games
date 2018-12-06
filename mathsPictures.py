@@ -46,7 +46,7 @@ def ulam(size):
             #ETAs are very wrong because factorising big numbers is slower than factorising little numbers
             logging.debug(f'percentDone: {round(percentDone,2)}\ttimeElapsed: {round(timeElapsed,2)}\t')
             print(f'{round(percentDone)}% done. ETA in {round(timeElapsed*(100-percentDone)/percentDone)} seconds.')
-        f = factors(i)
+        f = divisors(i)
         if f == 2: # prime
             im.putpixel((x, y), foreground)
         else:
@@ -84,13 +84,18 @@ def prime(max):
             primes.append(i)
     return primes
 
-def factors(n):
-    '''return the number of factors a number has'''
-    factors = 1
-    for i in range(1,n//2+1):
-        if n%i == 0:
-            factors += 1
-    return factors
+def divisors(n):
+    '''return the number of divisors a number has'''
+    divisors = 0
+    i = 1
+    while i <= n**(1/2):
+        if n % i == 0:
+            if i*i == n:
+                divisors += 1
+            else:
+                divisors += 2
+        i += 1
+    return divisors
 
 modes={'xor' : xor, 'ulam' : ulam}
 
