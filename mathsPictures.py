@@ -7,6 +7,11 @@
 from PIL import ImageColor
 from PIL import Image
 import argparse
+import time
+import logging
+logging.disable()
+logging.basicConfig(level=logging.DEBUG, format='%(lineno)s - %(asctime)s - %(levelname)s - %(message)s')
+
 
 def xor(size): 
     '''Each pixel is the xor of the x and y coordinates, multiplied by the RGB value of the
@@ -17,12 +22,17 @@ def xor(size):
         for y in range(0,size):
             im.putpixel((x, y), (round(foreground[0]/255*(x%256^y%256)), round(foreground[1]/255*(x%256^y%256)), round(foreground[2]/255*(x%256^y%266))))
     im.save(args.file)
+    print (f'\nImage saved to {args.file}.')
 
 def ulam(size):
     '''Starting in the center and going in an anti-clockwise spiral, colour prime pixels with 
     the foreground colour. '''
     im = Image.new('RGBA', (size,size), args.background)
+    print(f'Finding all primes below {size}^2 = {size**2} to put onto the image. This may take a while.')
+    start = time.time()
     primes = prime(size**2)
+    end = time.time()
+    print(f'Got {len(primes)} primes in {round(end - start, 2)} seconds.')
     directions = ['D', 'L', 'U', 'R']  # backwards so we can use negative indices to wrap around
     direction = 'R'
     count = 0
@@ -30,7 +40,14 @@ def ulam(size):
     x, y = size//2, size//2
     if size%2 == 0:
         x, y == size/2 -1, size/2
+    print('Making image: ')
+    start = time.time()
     for i in range(1,size**2):
+        if i > 1 and i in range(1,size**2,size**2//20):
+            percentDone = 100*i/size**2
+            timeElapsed = time.time() - start
+            logging.debug(f'percentDone: {percentDone}\ttimeElapsed: {timeElapsed}\t')
+            print(f'{round(percentDone)}% done. ETA in {round(timeElapsed*(100-percentDone)/percentDone)} seconds.')
         if i in primes:
             try:
                 im.putpixel((x, y), foreground)
@@ -52,6 +69,7 @@ def ulam(size):
             count = 0
             direction = directions[directions.index(direction) - 1]
     im.save(args.file)
+    print (f'\nImage saved to {args.file}.')
 
 def prime(max):
     '''Return all primes below max'''
