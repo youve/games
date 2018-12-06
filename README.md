@@ -1,6 +1,18 @@
 # Math Games
 These are some mathematical games that I wrote. Most of them I invented myself.
 
+## Maths Pictures##
+
+`mathspictures.py can create mathematical images like these:
+
+![Ulam spiral](./ulam.png)
+
+`./mathsPictures.py ulam ulam.png -f 'crimson' -b 'midnightblue' -s 100`
+
+![XOR](./xor.png)
+
+`./mathsPictures.py xor xor.png -f 'teal' -s 255`
+
 ## Geek of All Trades
 
 ![Gameboard](https://i.imgur.com/AujrAly.png "Gameboard")
