@@ -5,13 +5,17 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 `mathspictures.py` can create mathematical images like these:
 
+`./mathsPictures.py xor xor.png -f 'gold' -s 511`
+
+![XOR](./xor.png)
+
 `./mathsPictures.py ulam ulam.png -f 'skyblue' -b 'blue'`
 
 ![Ulam spiral](./ulam.png)
 
-`./mathsPictures.py xor xor.png -f 'gold' -s 511`
+`/mathsPictures.py ulam ulamdark.png -f 'blue' -b 'black'`
 
-![XOR](./xor.png)
+![Ulam spiral](./ulamdark.png)
 
 ## Geek of All Trades
 

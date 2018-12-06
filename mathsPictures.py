@@ -29,11 +29,7 @@ def ulam(size):
     '''Starting in the center and going in an anti-clockwise spiral, colour prime pixels with 
     the foreground colour. '''
     im = Image.new('RGBA', (size,size), args.background)
-    #print(f'Finding all primes below {size}^2 = {size**2} to put onto the image. This may take a while.')
     start = time.time()
-    #primes = prime(size**2)
-    #end = time.time()
-    #print(f'Got {len(primes)} primes in {round(end - start, 2)} seconds.')
     directions = ['D', 'L', 'U', 'R']  # backwards so we can use negative indices to wrap around
     direction = 'R'
     count = 0
@@ -47,16 +43,17 @@ def ulam(size):
         if i > 1 and i in range(1,size**2,size**2//20):
             percentDone = 100*i/size**2
             timeElapsed = time.time() - start
+            #ETAs are very wrong because factorising big numbers is slower than factorising little numbers
             logging.debug(f'percentDone: {round(percentDone,2)}\ttimeElapsed: {round(timeElapsed,2)}\t')
             print(f'{round(percentDone)}% done. ETA in {round(timeElapsed*(100-percentDone)/percentDone)} seconds.')
         f = factors(i)
-        if f == 2:
+        if f == 2: # prime
             im.putpixel((x, y), foreground)
         else:
             if ImageColor.getcolor(args.background, 'L') >= 128: # bright background gets darker when more composite
                 im.putpixel((x, y), (round(3/f*(background[0])), round(3/f*(background[1])), round(3/f*(background[2]))))
-            else: #darker background gets brighter when more composite, not done tweaking yet
-                im.putpixel((x, y), (round(f/3*(background[0])), round(f/3*(background[1])), round(f/3*(background[2]))))
+            else: #darker background gets brighter when more composite
+                im.putpixel((x, y), (min(255,round(f/3*(f + background[0]))), min(255,round(f/3*(f + background[1]))), min(255,round(f/3*(f + background[2])))))
         count +=1
         if direction == 'R':
             x = x+1
@@ -75,7 +72,7 @@ def ulam(size):
     print (f'\nImage saved to {args.file}.')
 
 def prime(max):
-    '''Return all primes below max'''
+    '''Return all primes below max. No longer used in ulam.'''
     primes = [2]
     for i in range(3,max):
         composite = False
