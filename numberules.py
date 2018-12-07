@@ -26,7 +26,7 @@ I am thinking of a type of number. I will give you 3 numbers between 0 and 9999 
 '''
 import random
 def again():
-    yes = input('Do you want to play again? Y/n ')
+    yes = input('Do you want to play again? Y/n ') or 'Y'
     if yes[0].upper() == 'Y':
         mainloop()
     else:
