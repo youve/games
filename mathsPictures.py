@@ -10,7 +10,7 @@ import argparse
 import time
 import cmath
 import logging
-import multiprocessing
+from numba import jit, int32, complex64
 #logging.disable()
 logging.basicConfig(level=logging.DEBUG, format='%(lineno)s - %(asctime)s - %(levelname)s - %(message)s')
 
@@ -73,6 +73,7 @@ def ulam(size):
     im.save(args.file)
     print (f'\nImage saved to {args.file}.')
 
+@jit(int32[:](int32))
 def prime(max):
     '''Return all primes below max. No longer used in ulam.'''
     primes = [2]
@@ -86,6 +87,7 @@ def prime(max):
             primes.append(i)
     return primes
 
+@jit(int32(int32))
 def divisors(n):
     '''return the number of divisors a number has'''
     divisors = 0
@@ -107,7 +109,8 @@ def mandelbrot(size):
         if x%10 == 0:
             print(f'{round(100*x/size)}% done.')
         for y in range(0,size):
-            escape = mandelbrotEscape(xyToComplex(x,y,size,center))
+            z = xyToComplex(x,y,size,center)
+            escape = mandelbrotEscape(z)
             # RGB allows for 16**6 colours and escape is a number between 0 and tries
             colour = '#{:06X}'.format(escape*16**6//args.tries)
             if colour == '#1000000':
@@ -117,6 +120,7 @@ def mandelbrot(size):
     im.save(args.file)
     print (f'\nImage saved to {args.file}.')
 
+@jit(complex64(int32,int32,int32,complex64))
 def xyToComplex(x,y, size, center=complex(0)):
     '''convert x y coordinates that have 0,0 at the top left to imaginary coordinates
     centred around the point specified with the -c flag. Returns a complex number'''
@@ -137,6 +141,7 @@ def xyToComplex(x,y, size, center=complex(0)):
         zImag -= ((size/2) -y)/(size*zoom/2)
     return complex(zReal, zImag)
 
+@jit(int32(complex64))
 def mandelbrotEscape(z):
     '''
     Convert the complex number to polar coordinates. The r coordinate gives
@@ -163,7 +168,7 @@ parser.add_argument('-f', '--foreground', metavar="mediumpurple", type=str, narg
     help="foreground colour", default="mediumpurple")
 parser.add_argument('-b', '--background', metavar="darkgray", type=str, default="darkgray", 
     help="Background colour", nargs="?")
-parser.add_argument('-c', '--center', metavar='real,imag', type=str, default='0,0', nargs='?', 
+parser.add_argument('-c', '--center', metavar='real,imag', type=complex, default='0+0j', nargs='?', 
     help='a complex number to centre the Mandelbrot set on')
 parser.add_argument('-t', '--tries', metavar=1000, type=int, default=1000, nargs='?',
     help='how many times to iterate before deciding a number is in the Mandelbrot set. Larger = more accurate, slower')
@@ -178,14 +183,16 @@ try:
     foreground = ImageColor.getcolor(args.foreground, 'RGBA')
 except ValueError:
     foreground = ImageColor.getcolor('mediumpurple', 'RGBA')
+    print(f'{args.foreground} isn\'t a valid colour. Using mediumpurple instead.')
 try:
     background = ImageColor.getcolor(args.background, 'RGBA')
 except ValueError:
+    print(f'{args.background} isn\'t a valid colour. Using darkgray instead.')
     background = ImageColor.getcolor('darkgray', 'RGBA')
 try:
     center = complex(args.center)
 except ValueError:
+    print(f'{args.center} isn\'t a valid complex number. Using 0+0j instead')
     center = 0j
 
-pool = multiprocessing.Pool(processes=2)
 modes[args.mode](args.size)
