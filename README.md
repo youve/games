@@ -31,6 +31,12 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 ![Mandelbrot set](./mandelbrot7.png)
 
+### Burning ship fractal
+
+`./mathsPictures.py --center="-0.7436325323523203+0.1318372588901597j" -t 32768  -z 1 ship ship.png -s 800 -f "#a91757"`
+
+![Burning ship](./ship.png)
+
 ## Geek of All Trades
 
 ![Gameboard](https://i.imgur.com/AujrAly.png "Gameboard")
