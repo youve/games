@@ -10,6 +10,7 @@ import argparse
 import time
 import cmath
 import logging
+import random
 from numba import jit, int32, complex128
 #logging.disable()
 logging.basicConfig(level=logging.DEBUG, format='%(lineno)s - %(asctime)s - %(levelname)s - %(message)s')
@@ -24,7 +25,26 @@ def xor(size):
         for y in range(0,size):
             im.putpixel((x, y), (round(foreground[0]/255*(x%256^y%256)), round(foreground[1]/255*(x%256^y%256)), round(foreground[2]/255*(x%256^y%266))))
     im.save(args.file)
+    im.show()
     print (f'\nImage saved to {args.file}.')
+
+def gradiant(size):
+    '''Produces wobbly lines varying in colour very slowly'''
+    print('Making gradiant')
+    im = Image.new('RGBA', (size,size), background)
+    r = foreground[0]
+    g = foreground[1]
+    b = foreground[2]
+    a = foreground[3]
+    for x in range(0,size):
+        for y in range(0,size):
+            im.putpixel((x, y), (r, g, b, a))
+            r = max(0, min(255, r + random.randint(-1,1)))
+            g = max(0, min(255, g + random.randint(-1,1)))
+            b = max(0, min(255, b + random.randint(-1,1)))
+    im.save(args.file)
+    im.show()
+    print(f'\nImage saved to {args.file}.')
 
 def ulam(size):
     '''Starting in the center and going in an anti-clockwise spiral, colour prime pixels with 
@@ -71,6 +91,7 @@ def ulam(size):
             count = 0
             direction = directions[directions.index(direction) - 1]
     im.save(args.file)
+    im.show()
     print (f'\nImage saved to {args.file}.')
 
 @jit(int32[:](int32))
@@ -118,27 +139,29 @@ def mandelbrot(size):
             colour = ImageColor.getcolor(colour, 'RGBA')
             im.putpixel((x, y), colour)
     im.save(args.file)
+    im.show()
     print (f'\nImage saved to {args.file}.')
 
 @jit(complex128(int32,int32,int32,complex128))
 def xyToComplex(x,y, size, center=complex(0)):
     '''convert x y coordinates that have 0,0 at the top left to imaginary coordinates
-    centred around the point specified with the -c flag. Returns a complex number'''
+    centred around the point specified with the --center flag. Returns a complex number'''
     zoom=args.zoom
     zReal, zImag = center.real, center.imag
     if x > size/2: #right half
         #suppose x is 180 and the image is 240 pixels wide
         #take x, subtract half the image so that 0 now represents the middle. 
-        #now we have a number like 60 
-        #divide by the size of the quadrant, getting 0.5 because we're halfway across the quadrant
-        #and then divide by zoom to zoom in that much?
-        zReal += (x - size/2)/(size*zoom/2)
+        #now we have a number like 60.
+        #divide by the size of the quadrant, which is size/2
+        #getting 0.5 for this x because we're halfway across the quadrant
+        #and also then divide by zoom to zoom in that much
+        zReal += (x - size/2)/(zoom*size/2)
     elif x < size/2: #left half
-        zReal -= ((size/2) -x)/(size*zoom/2)
+        zReal -= ((size/2) -x)/(zoom*size/2)
     if y > size/2: #top half
-        zImag += (y - size/2)/(size*zoom/2)
+        zImag += (y - size/2)/(zoom*size/2)
     elif y < size/2: #bottom half
-        zImag -= ((size/2) -y)/(size*zoom/2)
+        zImag -= ((size/2) -y)/(zoom*size/2)
     return complex(zReal, zImag)
 
 @jit(int32(complex128))
@@ -159,7 +182,7 @@ def mandelbrotEscape(z):
         bailout = bailout - 1
     return tries - bailout
 
-modes={'xor' : xor, 'ulam' : ulam, 'mandelbrot' : mandelbrot}
+modes={'xor' : xor, 'ulam' : ulam, 'mandelbrot' : mandelbrot, 'gradiant' : gradiant}
 
 parser = argparse.ArgumentParser(description='Make maths pictures.')
 parser.add_argument('-s', '--size', metavar="255", type=int, choices=range(1,4095), 
