@@ -23,7 +23,7 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 ### Mandelbrot sets
 
-`./mathsPictures.py mandelbrot mandelbrot.png -s 500 --center=-1+.3j --tries 3000 --zoom 4`
+`./mathsPictures.py mandelbrot mandelbrot4.png -s 500 --center=-1+.3j --tries 3000 --zoom 4 -f #303`
 
 ![Mandelbrot set](./mandelbrot4.png)
 
@@ -99,4 +99,4 @@ In Fortune mode, you are given a short fortune to type, from the unix program `f
 
 
 ## Mastermind
-`mastermind.py` is not my invention, I just coded it up. [Mastermind](https://en.wikipedia.org/wiki/Mastermind_(board_game)) is a famous board game. The computer thinks of an n-digit number, which you must guess. After each guess, the computer tells you how many digits were correct and how many were in the right position. 
+`mastermind.py` is not my invention, I just coded it up. [Mastermind](https://en.wikipedia.org/wiki/Mastermind_(board_game)) is a famous board game. The computer thinks of an n-digit number, which you must guess. After each guess, the computer tells you how many digits were correct and how many were in the right position.

@@ -19,7 +19,7 @@ def xor(size):
     specified foreground colour. Background colour doesn't affect anything.
     Using x%256 XOR y%256 allows us to make pictures of any size'''
     print('Making an XOR.')
-    im = Image.new('RGBA', (size,size), args.background)
+    im = Image.new('RGBA', (size,size), background)
     for x in range(0,size):
         for y in range(0,size):
             im.putpixel((x, y), (round(foreground[0]/255*(x%256^y%256)), round(foreground[1]/255*(x%256^y%256)), round(foreground[2]/255*(x%256^y%266))))
@@ -30,7 +30,7 @@ def ulam(size):
     '''Starting in the center and going in an anti-clockwise spiral, colour prime pixels with 
     the foreground colour. '''
     print('Making an ulam spiral.')
-    im = Image.new('RGBA', (size,size), args.background)
+    im = Image.new('RGBA', (size,size), background)
     start = time.time()
     directions = ['D', 'L', 'U', 'R']  # backwards so we can use negative indices to wrap around
     direction = 'R'
@@ -102,9 +102,9 @@ def divisors(n):
     return divisors
 
 def mandelbrot(size):
-    '''Create a picture of a Mandelbrot.'''
+    '''Create a picture of a Mandelbrot. The foreground colour is an offset'''
     print('Making a Mandelbrot')
-    im = Image.new('RGBA', (size,size), args.background)
+    im = Image.new('RGBA', (size,size), background)
     for x in range(0,size):
         if x%10 == 0:
             print(f'{round(100*x/size)}% done.')
@@ -112,11 +112,13 @@ def mandelbrot(size):
             z = xyToComplex(x,y,size,center)
             escape = mandelbrotEscape(z)
             # RGB allows for 16**6 colours and escape is a number between 0 and tries
-            colour = '#{:06X}'.format(escape*16**6//args.tries)
-            if colour == '#1000000':
-                colour = '#ffffff'
-            colour = ImageColor.getcolor(colour, 'RGBA')
-            im.putpixel((x, y), colour)
+            baseColour = '#{:06X}'.format((escape*16**6//args.tries)%16**3)
+            baseColour = ImageColor.getcolor(baseColour, 'RGBA')
+            colour=[]
+            #TODO: make this less ugly
+            for i, c in enumerate(baseColour): # shift according to foreground colour
+                colour.append((c + foreground[i])%256)
+            im.putpixel((x, y), tuple(colour))
     im.save(args.file)
     print (f'\nImage saved to {args.file}.')
 
