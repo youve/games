@@ -8,16 +8,17 @@ from PIL import ImageColor
 from PIL import Image
 import argparse
 import time
-import math
+import cmath
 import logging
+import multiprocessing
 #logging.disable()
 logging.basicConfig(level=logging.DEBUG, format='%(lineno)s - %(asctime)s - %(levelname)s - %(message)s')
-
 
 def xor(size): 
     '''Each pixel is the xor of the x and y coordinates, multiplied by the RGB value of the
     specified foreground colour. Background colour doesn't affect anything.
     Using x%256 XOR y%256 allows us to make pictures of any size'''
+    print('Making an XOR.')
     im = Image.new('RGBA', (size,size), args.background)
     for x in range(0,size):
         for y in range(0,size):
@@ -28,6 +29,7 @@ def xor(size):
 def ulam(size):
     '''Starting in the center and going in an anti-clockwise spiral, colour prime pixels with 
     the foreground colour. '''
+    print('Making an ulam spiral.')
     im = Image.new('RGBA', (size,size), args.background)
     start = time.time()
     directions = ['D', 'L', 'U', 'R']  # backwards so we can use negative indices to wrap around
@@ -97,14 +99,77 @@ def divisors(n):
         i += 1
     return divisors
 
-modes={'xor' : xor, 'ulam' : ulam}
+def mandelbrot(size):
+    '''Create a picture of a Mandelbrot.'''
+    print('Making a Mandelbrot')
+    im = Image.new('RGBA', (size,size), args.background)
+    for x in range(0,size):
+        if x%10 == 0:
+            print(f'{round(100*x/size)}% done.')
+        for y in range(0,size):
+            escape = mandelbrotEscape(xyToComplex(x,y,size,center))
+            # RGB allows for 16**6 colours and escape is a number between 0 and tries
+            colour = '#{:06X}'.format(escape*16**6//args.tries)
+            if colour == '#1000000':
+                colour = '#ffffff'
+            colour = ImageColor.getcolor(colour, 'RGBA')
+            im.putpixel((x, y), colour)
+    im.save(args.file)
+    print (f'\nImage saved to {args.file}.')
 
-parser = argparse.ArgumentParser(description='Make an ulam spiral.')
-parser.add_argument('-s', '--size', metavar="255", type=int, choices=range(1,4095), help="Image size.", 
-    default='255', nargs='?')
-parser.add_argument('-f', '--foreground', metavar="mediumpurple", type=str, help="foreground colour", default="mediumpurple", nargs="?")
-parser.add_argument('-b', '--background', metavar="darkgray", type=str, help="Background colour", default="darkgray", nargs="?")
-parser.add_argument('mode', help='ulam, xor', choices=modes.keys())
+def xyToComplex(x,y, size, center=complex(0)):
+    '''convert x y coordinates that have 0,0 at the top left to imaginary coordinates
+    centred around the point specified with the -c flag. Returns a complex number'''
+    zoom=args.zoom
+    zReal, zImag = center.real, center.imag
+    if x > size/2: #right half
+        #suppose x is 180 and the image is 240 pixels wide
+        #take x, subtract half the image so that 0 now represents the middle. 
+        #now we have a number like 60 
+        #divide by the size of the quadrant, getting 0.5 because we're halfway across the quadrant
+        #and then divide by zoom to zoom in that much?
+        zReal += (x - size/2)/(size*zoom/2)
+    elif x < size/2: #left half
+        zReal -= ((size/2) -x)/(size*zoom/2)
+    if y > size/2: #top half
+        zImag += (y - size/2)/(size*zoom/2)
+    elif y < size/2: #bottom half
+        zImag -= ((size/2) -y)/(size*zoom/2)
+    return complex(zReal, zImag)
+
+def mandelbrotEscape(z):
+    '''
+    Convert the complex number to polar coordinates. The r coordinate gives
+    the radius from 0. If that stays less than 2 for 1000 tries, it's probably
+    in the Mandelbrot set. If it ever gets bigger than 2, then squaring it will make it
+    rapidly approach infinity and is definitely not in the Mandelbrot set.
+
+    Return how many tries it took before the number got bigger than 2"
+    '''
+    tries = args.tries
+    newz = z**2 + z
+    bailout = tries
+    while cmath.polar(newz)[0] < 2 and bailout > 0:
+        newz = newz**2 + z
+        bailout = bailout - 1
+    return tries - bailout
+
+modes={'xor' : xor, 'ulam' : ulam, 'mandelbrot' : mandelbrot}
+
+parser = argparse.ArgumentParser(description='Make maths pictures.')
+parser.add_argument('-s', '--size', metavar="255", type=int, choices=range(1,4095), 
+    help="Image size.", default='255', nargs='?')
+parser.add_argument('-f', '--foreground', metavar="mediumpurple", type=str, nargs="?", 
+    help="foreground colour", default="mediumpurple")
+parser.add_argument('-b', '--background', metavar="darkgray", type=str, default="darkgray", 
+    help="Background colour", nargs="?")
+parser.add_argument('-c', '--center', metavar='real,imag', type=str, default='0,0', nargs='?', 
+    help='a complex number to centre the Mandelbrot set on')
+parser.add_argument('-t', '--tries', metavar=1000, type=int, default=1000, nargs='?',
+    help='how many times to iterate before deciding a number is in the Mandelbrot set. Larger = more accurate, slower')
+parser.add_argument('-z', '--zoom', metavar=.5, type=float, default=.5, nargs='?', 
+    help='how far to zoom in on the Mandelbrot set')
+parser.add_argument('mode', help='ulam, xor, mandelbrot', choices=modes.keys())
 parser.add_argument('file', type=str, metavar='outputFilename.png', help='output file name')
 
 args = parser.parse_args()
@@ -117,5 +182,10 @@ try:
     background = ImageColor.getcolor(args.background, 'RGBA')
 except ValueError:
     background = ImageColor.getcolor('darkgray', 'RGBA')
+try:
+    center = complex(args.center)
+except ValueError:
+    center = 0j
 
+pool = multiprocessing.Pool(processes=2)
 modes[args.mode](args.size)

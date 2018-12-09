@@ -17,6 +17,10 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 ![Ulam spiral](./ulamdark.png)
 
+`./mathsPictures.py mandelbrot mandelbrot.png -s 500 -c -.5 -t 3000`
+
+![Mandelbrot set](./mandelbrot3.png)
+
 ## Geek of All Trades
 
 ![Gameboard](https://i.imgur.com/AujrAly.png "Gameboard")
