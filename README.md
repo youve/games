@@ -27,9 +27,9 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 ![Mandelbrot set](./mandelbrot4.png)
 
-./mathsPictures.py mandelbrot mandelbrot.png -s 500 --center=-1+.3j --tries 4000 --zoom 32 -f gold
+./mathsPictures.py mandelbrot mandelbrot.png -s 500 --center=-1+.3j --tries 32000 --zoom 32 -f gold
 
-![Mandelbrot set](./mandelbrot5.png)
+![Mandelbrot set](./mandelbrot7.png)
 
 ## Geek of All Trades
 
