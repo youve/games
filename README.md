@@ -7,25 +7,29 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 ### XOR
 
-`./mathsPictures.py xor xor.png -f 'gold' -s 511`
+`./mathsPictures.py xor xor.png --foreground 'gold' --size 511`
 
 ![XOR](./xor.png)
 
-`./mathsPictures.py ulam ulam.png -f 'skyblue' -b 'blue'`
+`./mathsPictures.py ulam ulam.png --foreground 'skyblue' --background 'blue'`
 
 ### Ulam spirals
 
 ![Ulam spiral](./ulam.png)
 
-`/mathsPictures.py ulam ulamdark.png -f 'blue' -b 'black'`
+`/mathsPictures.py ulam ulamdark.png --foreground 'blue' --background 'black'`
 
 ![Ulam spiral](./ulamdark.png)
 
 ### Mandelbrot sets
 
-`./mathsPictures.py mandelbrot mandelbrot4.png -s 500 --center=-1+.3j --tries 3000 --zoom 4 -f #303`
+`./mathsPictures.py mandelbrot mandelbrot4.png --size 500 --center=-1+.3j --tries 3000 --zoom 4 --foreground #303`
 
 ![Mandelbrot set](./mandelbrot4.png)
+
+./mathsPictures.py mandelbrot mandelbrot.png -s 500 --center=-1+.3j --tries 4000 --zoom 32 -f gold
+
+![Mandelbrot set](./mandelbrot5.png)
 
 ## Geek of All Trades
 
@@ -100,3 +104,4 @@ In Fortune mode, you are given a short fortune to type, from the unix program `f
 
 ## Mastermind
 `mastermind.py` is not my invention, I just coded it up. [Mastermind](https://en.wikipedia.org/wiki/Mastermind_(board_game)) is a famous board game. The computer thinks of an n-digit number, which you must guess. After each guess, the computer tells you how many digits were correct and how many were in the right position.
+
