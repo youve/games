@@ -164,9 +164,9 @@ def xyToComplex(x,y, size, center=complex(0)):
         zImag -= ((size/2) -y)/(zoom*size/2)
     z = complex(zReal, zImag)
     if x == 0 and y == 0:
-        print('Left edge:', z)
+        print('Top left edge:', z)
     elif x == size -1 and y == size - 1:
-        print('Right edge: ', z)
+        print('Bottom right edge: ', z)
     return z
 
 @jit(int32(complex128))
