@@ -23,11 +23,11 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 ### Mandelbrot sets
 
-`./mathsPictures.py mandelbrot mandelbrot4.png --size 500 --center=-1+.3j --tries 3000 --zoom 4 --foreground #303`
+`./mathsPictures.py mandelbrot mandelbrot4.png --size 500 --center=-1+.3j --tries 32768 --zoom 4 --foreground #033`
 
 ![Mandelbrot set](./mandelbrot4.png)
 
-./mathsPictures.py mandelbrot mandelbrot.png -s 500 --center=-1+.3j --tries 32000 --zoom 32 -f gold
+./mathsPictures.py mandelbrot mandelbrot7.png -s 500 --center=-1+.3j --tries 65536 --zoom 128 -f crimson
 
 ![Mandelbrot set](./mandelbrot7.png)
 
