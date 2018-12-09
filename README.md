@@ -5,17 +5,23 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 `mathspictures.py` can create mathematical images like these:
 
+### XOR
+
 `./mathsPictures.py xor xor.png -f 'gold' -s 511`
 
 ![XOR](./xor.png)
 
 `./mathsPictures.py ulam ulam.png -f 'skyblue' -b 'blue'`
 
+### Ulam spirals
+
 ![Ulam spiral](./ulam.png)
 
 `/mathsPictures.py ulam ulamdark.png -f 'blue' -b 'black'`
 
 ![Ulam spiral](./ulamdark.png)
+
+### Mandelbrot sets
 
 `./mathsPictures.py mandelbrot mandelbrot.png -s 500 --center=-1+.3j --tries 3000 --zoom 4`
 
