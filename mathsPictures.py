@@ -162,13 +162,18 @@ def xyToComplex(x,y, size, center=complex(0)):
         zImag += (y - size/2)/(zoom*size/2)
     elif y < size/2: #bottom half
         zImag -= ((size/2) -y)/(zoom*size/2)
-    return complex(zReal, zImag)
+    z = complex(zReal, zImag)
+    if x == 0 and y == 0:
+        print('Left edge:', z)
+    elif x == size -1 and y == size - 1:
+        print('Right edge: ', z)
+    return z
 
 @jit(int32(complex128))
 def mandelbrotEscape(z):
     '''
     Convert the complex number to polar coordinates. The r coordinate gives
-    the radius from 0. If that stays less than 2 for 1000 tries, it's probably
+    the radius from 0. If that stays less than 2 for many tries, it's probably
     in the Mandelbrot set. If it ever gets bigger than 2, then squaring it will make it
     rapidly approach infinity and is definitely not in the Mandelbrot set.
 
@@ -182,7 +187,44 @@ def mandelbrotEscape(z):
         bailout = bailout - 1
     return tries - bailout
 
-modes={'xor' : xor, 'ulam' : ulam, 'mandelbrot' : mandelbrot, 'gradiant' : gradiant}
+@jit(int32(complex128))
+def shipEscape(z):
+    '''
+    Convert the complex number to polar coordinates. The r coordinate gives
+    the radius from 0. Almost the same as Mandelbrot except take the absolute value of the 
+    real part and imaginary parts separately before each squaring.
+
+    Return how many tries it took before the number got bigger than 2"
+    '''
+    tries = args.tries
+    newz = complex(abs(z.real), abs(z.imag))**2 + z
+    bailout = tries
+    while cmath.polar(newz)[0] < 2 and bailout > 0:
+        newz = complex(abs(newz.real), abs(newz.imag))**2 + z
+        bailout = bailout - 1
+    return tries - bailout
+
+def ship(size):
+    '''Create a picture of a Burning Ship fractal. The foreground colour is an offset'''
+    print('Burning a Ship.')
+    im = Image.new('RGBA', (size,size), background)
+    for x in range(0,size):
+        if x%(size//20) == 0:
+            print(f'{round(100*x/size)}% done.')
+        for y in range(0,size):
+            z = xyToComplex(x,y,size,center)
+            escape = shipEscape(z)
+            # RGB allows for 16**6 colours and escape is a number between 0 and tries
+            foregroundDec = foreground[0]*256**2 + foreground[1]*256 + foreground[2]
+            baseColourDec = escape*16**6//args.tries
+            colour = '#{:06X}'.format((foregroundDec + baseColourDec)%16**6)
+            colour = ImageColor.getcolor(colour, 'RGBA')
+            im.putpixel((x, y), colour)
+    im.save(args.file)
+    im.show()
+    print (f'\nImage saved to {args.file}.')
+
+modes={'xor' : xor, 'ulam' : ulam, 'mandelbrot' : mandelbrot, 'gradiant' : gradiant, 'ship':ship}
 
 parser = argparse.ArgumentParser(description='Make maths pictures.')
 parser.add_argument('-s', '--size', metavar="255", type=int, choices=range(1,4095), 
