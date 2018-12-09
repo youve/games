@@ -168,8 +168,9 @@ parser.add_argument('-f', '--foreground', metavar="mediumpurple", type=str, narg
     help="foreground colour", default="mediumpurple")
 parser.add_argument('-b', '--background', metavar="darkgray", type=str, default="darkgray", 
     help="Background colour", nargs="?")
-parser.add_argument('-c', '--center', metavar='real,imag', type=complex, default='0+0j', nargs='?', 
-    help='a complex number to centre the Mandelbrot set on')
+parser.add_argument('--center', metavar='real,imag', type=complex, default='0+0j', nargs='?', 
+    help='a complex number to centre the Mandelbrot set on. If you use a negative number, you \
+    must specify it like --center="-.1-.1j" with the equal sign or the argparser gets confused.')
 parser.add_argument('-t', '--tries', metavar=10000, type=int, default=10000, nargs='?',
     help='how many times to iterate before deciding a number is in the Mandelbrot set. Larger = more accurate, slower')
 parser.add_argument('-z', '--zoom', metavar=.5, type=float, default=.5, nargs='?', 
