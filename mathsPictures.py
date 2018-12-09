@@ -10,7 +10,7 @@ import argparse
 import time
 import cmath
 import logging
-from numba import jit, int32, complex64
+from numba import jit, int32, complex128
 #logging.disable()
 logging.basicConfig(level=logging.DEBUG, format='%(lineno)s - %(asctime)s - %(levelname)s - %(message)s')
 
@@ -46,7 +46,7 @@ def ulam(size):
             percentDone = 100*i/size**2
             timeElapsed = time.time() - start
             #ETAs are very wrong because factorising big numbers is slower than factorising little numbers
-            logging.debug(f'percentDone: {round(percentDone,2)}\ttimeElapsed: {round(timeElapsed,2)}\t')
+            #logging.debug(f'percentDone: {round(percentDone,2)}\ttimeElapsed: {round(timeElapsed,2)}\t')
             print(f'{round(percentDone)}% done. ETA in {round(timeElapsed*(100-percentDone)/percentDone)} seconds.')
         f = divisors(i)
         if f == 2: # prime
@@ -106,7 +106,7 @@ def mandelbrot(size):
     print('Making a Mandelbrot')
     im = Image.new('RGBA', (size,size), background)
     for x in range(0,size):
-        if x%10 == 0:
+        if x%(size//20) == 0:
             print(f'{round(100*x/size)}% done.')
         for y in range(0,size):
             z = xyToComplex(x,y,size,center)
@@ -120,7 +120,7 @@ def mandelbrot(size):
     im.save(args.file)
     print (f'\nImage saved to {args.file}.')
 
-@jit(complex64(int32,int32,int32,complex64))
+@jit(complex128(int32,int32,int32,complex128))
 def xyToComplex(x,y, size, center=complex(0)):
     '''convert x y coordinates that have 0,0 at the top left to imaginary coordinates
     centred around the point specified with the -c flag. Returns a complex number'''
@@ -141,7 +141,7 @@ def xyToComplex(x,y, size, center=complex(0)):
         zImag -= ((size/2) -y)/(size*zoom/2)
     return complex(zReal, zImag)
 
-@jit(int32(complex64))
+@jit(int32(complex128))
 def mandelbrotEscape(z):
     '''
     Convert the complex number to polar coordinates. The r coordinate gives
