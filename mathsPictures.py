@@ -112,13 +112,11 @@ def mandelbrot(size):
             z = xyToComplex(x,y,size,center)
             escape = mandelbrotEscape(z)
             # RGB allows for 16**6 colours and escape is a number between 0 and tries
-            baseColour = '#{:06X}'.format((escape*16**6//args.tries)%16**3)
-            baseColour = ImageColor.getcolor(baseColour, 'RGBA')
-            colour=[]
-            #TODO: make this less ugly
-            for i, c in enumerate(baseColour): # shift according to foreground colour
-                colour.append((c + foreground[i])%256)
-            im.putpixel((x, y), tuple(colour))
+            foregroundDec = foreground[0]*256**2 + foreground[1]*256 + foreground[2]
+            baseColourDec = escape*16**6//args.tries
+            colour = '#{:06X}'.format((foregroundDec + baseColourDec)%16**6)
+            colour = ImageColor.getcolor(colour, 'RGBA')
+            im.putpixel((x, y), colour)
     im.save(args.file)
     print (f'\nImage saved to {args.file}.')
 
