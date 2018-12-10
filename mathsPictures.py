@@ -4,8 +4,7 @@
 # creates a 100x100 pixel crimson ulam spiral on a midnightblue background
 # ./mathsPictures.py xor xor.png -f 'darkgreen' creates a darkgreen tinted xor image.
 
-from PIL import ImageColor
-from PIL import Image
+from PIL import Image, ImageColor, ImageDraw
 import argparse
 import time
 import cmath
@@ -46,26 +45,30 @@ def gradiant(size):
     im.show()
     print(f'\nImage saved to {args.file}.')
 
-def makeSpiral(x, y, size): #clockwise=False
-    '''Returns next x,y coordinate based on current x,y coordinates, and image size. '''
-    if size%2 == 1:
-        if x <= y and x + y >= size -1: #right
-            x = x + 1
-        elif x > y and x + y <= size -1: #left
-            x = x - 1
-        elif x <= y and x + y < size -1: #down
-            y = y + 1
-        elif x > y and x + y > size -1: #up
-            y = y - 1
-    else:
-        if x < y and x + y >= size -1: #right
-            x = x + 1
-        elif x >= y and x + y <= size -1: #left
-            x = x - 1
-        elif x < y and x + y < size -1: #down
-            y = y + 1
-        elif x >= y and x + y >= size: #up
-            y = y - 1
+def makeSpiral(x, y, size, step=1): #clockwise=False
+    '''Returns next x,y coordinate based on current x,y coordinates, and image size. 
+    The spiral goes anticlockwise and always starts out going right. Even sized spirals
+    finish at the top left; odd sized spirals finish at the bottom right.'''
+    while step > 0:
+        if size%2 == 1:
+            if x <= y and x + y >= size -1: #right
+                x = x + 1
+            elif x > y and x + y <= size -1: #left
+                x = x - 1
+            elif x <= y and x + y < size -1: #down
+                y = y + 1
+            elif x > y and x + y > size -1: #up
+                y = y - 1
+        else:
+            if x < y and x + y >= size -1: #right
+                x = x + 1
+            elif x >= y and x + y <= size -1: #left
+                x = x - 1
+            elif x < y and x + y < size -1: #down
+                y = y + 1
+            elif x >= y and x + y >= size: #up
+                y = y - 1
+        step -= 1
     return x, y
 
 def ulam(size):
@@ -98,6 +101,46 @@ def ulam(size):
     im.save(args.file)
     im.show()
     print (f'\nImage saved to {args.file}.')
+
+def fib(size):
+    '''Fibonacci nubmers are foreground, other numbers are background'''
+    print('Making a Fibonacci spiral')
+    im = Image.new('RGBA', (size,size), background)
+    #draw = ImageDraw.Draw(im)
+    x, y = size//2, size//2
+    f = fibonacci(1,2)
+    nextf = next(f)
+    print(nextf)
+    if size%2 == 0:
+        x, y = int(size/2 -1), int(size/2)
+    for i in range(1,size**2):
+        if x%(size//20) == 0:
+            print(f'{round(100*x/size)}% done.')
+        if i == nextf:
+            nextf = next(f)
+            im.putpixel((x, y), foreground)
+            #draw.line([(x, y), (makeSpiral(x,y, size, step=nextf - i))], fill=foreground)
+            print(nextf)
+        x,y = makeSpiral(x, y, size)
+    im.save(args.file)
+    # This image is pretty disappointing because the fibonacci's get big fast.
+    im.show()
+    print(f'\nImage saved to {args.file}.')
+
+#@jit(int32,int32(int32))
+def fibonacci(a=0,b=1):
+    '''generator that yields the next fibonacci number'''
+    while True:
+        yield a
+        a, b = b, a + b
+
+def hilbert():
+    '''Hilbert numbers are numbers that match the pattern 4×n +1'''
+    i = 0
+    while True:
+        h = 4*i + 1
+        i +=1
+        yield h
 
 @jit(int32[:](int32))
 def prime(max):
@@ -229,7 +272,9 @@ def ship(size):
     im.show()
     print (f'\nImage saved to {args.file}.')
 
-modes={'xor' : xor, 'ulam' : ulam, 'mandelbrot' : mandelbrot, 'gradiant' : gradiant, 'ship':ship}
+modes={'xor' : xor, 'ulam' : ulam, 'mandelbrot' : mandelbrot, 'gradiant' : gradiant, 'ship':ship,
+    'fib' : fib
+}
 
 parser = argparse.ArgumentParser(description='Make maths pictures.')
 parser.add_argument('-s', '--size', metavar="255", type=int, choices=range(1,4095), 
