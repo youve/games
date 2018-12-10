@@ -33,7 +33,7 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 ### Burning ship fractal
 
-`./mathsPictures.py --center="-1.6" -t 8192 -z 4 ship ship.png -s 600 -f "black"`
+`./mathsPictures.py --center="-1.617" -t 16384 -z 4096 ship ship2.png -s 600 -f "#006"`
 
 ![Burning ship](./ship.png)
 
