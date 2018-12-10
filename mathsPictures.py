@@ -46,16 +46,34 @@ def gradiant(size):
     im.show()
     print(f'\nImage saved to {args.file}.')
 
+def makeSpiral(x, y, size): #clockwise=False
+    '''Returns next x,y coordinate based on current x,y coordinates, and image size. '''
+    if size%2 == 1:
+        if x <= y and x + y >= size -1: #right
+            x = x + 1
+        elif x > y and x + y <= size -1: #left
+            x = x - 1
+        elif x <= y and x + y < size -1: #down
+            y = y + 1
+        elif x > y and x + y > size -1: #up
+            y = y - 1
+    else:
+        if x < y and x + y >= size -1: #right
+            x = x + 1
+        elif x >= y and x + y <= size -1: #left
+            x = x - 1
+        elif x < y and x + y < size -1: #down
+            y = y + 1
+        elif x >= y and x + y >= size: #up
+            y = y - 1
+    return x, y
+
 def ulam(size):
     '''Starting in the center and going in an anti-clockwise spiral, colour prime pixels with 
     the foreground colour. '''
     print('Making an ulam spiral.')
     im = Image.new('RGBA', (size,size), background)
     start = time.time()
-    directions = ['D', 'L', 'U', 'R']  # backwards so we can use negative indices to wrap around
-    direction = 'R'
-    count = 0
-    sidelength = 1
     x, y = size//2, size//2
     if size%2 == 0:
         x, y = int(size/2 -1), int(size/2)
@@ -76,20 +94,7 @@ def ulam(size):
                 im.putpixel((x, y), (round(3/f*(background[0])), round(3/f*(background[1])), round(3/f*(background[2]))))
             else: #darker background gets brighter when more composite
                 im.putpixel((x, y), (min(255,round(f/3*(f + background[0]))), min(255,round(f/3*(f + background[1]))), min(255,round(f/3*(f + background[2])))))
-        count +=1
-        if direction == 'R':
-            x = x+1
-        elif direction == 'U':
-            y = y-1
-        elif direction == 'L':
-            x = x-1
-        elif direction == 'D':
-            y = y+1
-        if count == sidelength:
-            if direction in ('U', 'D'):
-                sidelength += 1
-            count = 0
-            direction = directions[directions.index(direction) - 1]
+        x, y = makeSpiral(x, y, size)
     im.save(args.file)
     im.show()
     print (f'\nImage saved to {args.file}.')
