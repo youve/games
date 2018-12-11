@@ -190,7 +190,7 @@ def mandelbrot(size):
     im.show()
     print (f'\nImage saved to {args.file}.')
 
-@jit(complex128(int32,int32,int32,complex128))
+@jit(complex128(int32,int32,int32,complex128), cache=True)
 def xyToComplex(x,y, size, center=complex(0)):
     '''convert x y coordinates that have 0,0 at the top left to imaginary coordinates
     centred around the point specified with the --center flag. Returns a complex number'''
@@ -217,7 +217,7 @@ def xyToComplex(x,y, size, center=complex(0)):
         print('Bottom right edge: ', z)
     return z
 
-@jit(int32(complex128))
+@jit(int32(complex128), cache=True)
 def mandelbrotEscape(z):
     '''
     Convert the complex number to polar coordinates. The r coordinate gives
@@ -235,7 +235,7 @@ def mandelbrotEscape(z):
         bailout = bailout - 1
     return tries - bailout
 
-@jit(int32(complex128))
+@jit(int32(complex128), cache=True)
 def shipEscape(z):
     '''
     Convert the complex number to polar coordinates. The r coordinate gives
