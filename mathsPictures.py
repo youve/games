@@ -45,6 +45,20 @@ def gradiant(size):
     im.show()
     print(f'\nImage saved to {args.file}.')
 
+@jit
+def incColour(by):
+    '''return colour''' #doesn't create a smooth gradiant but the result is pretty when arranged in a spiral
+    if by == args.tries:
+        return foreground
+    step = (by * 16 ** 6) // args.tries
+    increment = (step // (256 ** 2), step % (256 ** 2) // 256, step % 256)
+    colour = list(foreground)
+    for i, v in enumerate(increment): #maybe
+        if foreground[i] + increment[i] < 256:
+            colour[i] = foreground[i] + increment[i]
+        else: colour[i] = 255 * 2 - foreground[i] - increment[i]
+    return tuple(colour)
+
 def makeSpiral(x, y, size, step=1): #clockwise=False
     '''Returns next x,y coordinate based on current x,y coordinates, and image size. 
     The spiral goes anticlockwise and always starts out going right. Even sized spirals
