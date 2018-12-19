@@ -9,6 +9,11 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 ![Mandelbrot](./images/mandelbrot-0.11378702859237537%2B0.8826781799120236jx1048576.0.png)
 
+`./fractals.py magnet2 magnet2 --size 600 --palette "darkgreen" --center="0.347-0.189583j" --zoom 32 --tries 200`
+
+![Magnet2](./images/magnet2_0.347+-0.189583i_x32.0.png)
+
+
 When an image is complete (i.e. it's not currently running something), you can:
 * Left mouse click to recentre on a point and zoom in by a factor of 2.
 * s to save the image. It will be saved as `filename{centerCoordinates}x{zoom}.png` to avoid collisions.
