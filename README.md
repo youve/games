@@ -13,10 +13,13 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 ![Magnet2](./images/magnet2_0.347+-0.189583i_x32.0.png)
 
+`./fractals.py ship images/ship --center="-1.7960554315-0.00002333363j" -s 600 -z 32768 -t 320 -p "darkblue"`
+
+![Burning ship](./images/ship_-1.7960554315+-2.333363e-05i_x32768.0.png)
 
 When an image is complete (i.e. it's not currently running something), you can:
 * Left mouse click to recentre on a point and zoom in by a factor of 2.
-* s to save the image. It will be saved as `filename{centerCoordinates}x{zoom}.png` to avoid collisions.
+* s to save the image. It will be saved as `filename_{centerCoordinates}_x{zoom}.png` to avoid collisions.
 * b to add bump mapping to the image to create an illusion of 3D texture.
 
 ## Maths Pictures
