@@ -17,9 +17,11 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 ![Burning ship](./images/ship_-1.7960554315+-2.333363e-05i_x32768.0.png)
 
-`./fractals.py sinh images/sinh -s 600 -z 4 --center="0.26997916666666666+0.8047086666666666j"`
+If you don't specify a palette at load time, it autogenerates one for you based around a random colour, bright green in this case:
 
-![Sinh](./images/sinh_0.26997916666666666+0.8047086666666666i_x4.0.png)
+`./fractals.py sinh images/sinh -s 600 -z 64 --center="0.49779167+1.0633545333333334j"`
+
+![Sinh](./images/sinh_0.49779167+1.0633545333333334i_x64.0.png)
 
 
 When an image is complete (i.e. it's not currently running something), you can:
