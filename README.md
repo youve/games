@@ -17,6 +17,11 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 ![Burning ship](./images/ship_-1.7960554315+-2.333363e-05i_x32768.0.png)
 
+`./fractals.py sinh images/sinh -s 600 -z 4 --center="0.26997916666666666+0.8047086666666666j"`
+
+![Sinh](./images/sinh_0.26997916666666666+0.8047086666666666i_x4.0.png)
+
+
 When an image is complete (i.e. it's not currently running something), you can:
 * Left mouse click to recentre on a point and zoom in by a factor of 2.
 * s to save the image. It will be saved as `filename_{centerCoordinates}_x{zoom}.png` to avoid collisions.

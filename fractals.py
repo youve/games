@@ -8,7 +8,8 @@ import cmath
 import math
 import logging
 import random
-from numba import jit, int32, complex128
+from numba import jit, njit, prange
+from numba.types import *
 import sys
 import itertools
 #logging.disable()
@@ -17,33 +18,27 @@ logging.basicConfig(level=logging.DEBUG, format='%(lineno)s - %(asctime)s - %(le
 #TODO listen for clicks even while building image and respond
 #TODO speed things up by first doing big fuzzy pixels
 
-@jit
+@jit(int64[:](int64[:], int64[:], int64, int64), parallel=True, fastmath=True)
 def smoothColor(colora, colorb, by, total):
     '''return colour'''
-    colour = pygame.Color(0,0,0,255)
+    colour = [0, 0, 0, 255]
     for i, v in enumerate(colora):
         colour[i] = int((v * (total - by) / total) + (colorb[i] * by / total))
-    colour.a = 255
+    colour[-1] = 255
     return colour
 
-@jit 
-def smoothColorPalette(by):
-    '''determine which two colours to smooth between'''
-    colour = pygame.Color(0,0,0,255)
-    if by == tries:
-        return colour
-    for i in range(len(palette) -1):
-        if i / (len(palette) - 1) <= by/tries <= (i + 1) / (len(palette) - 1):
-            return smoothColor(palette[i], palette[i+1], 
-                        by % (tries // (len(palette) - 1 )), 
-                        tries // (len(palette) - 1))
-    #logging.debug(f'by: {by}, tries:{tries}, by/tries: {by/tries}')
-
 @jit
+def smoothColorPalette(by, buckets, parallel=True, fastmath=True):
+    '''determine which two colours to smooth between'''
+    for i in prange(buckets):
+        if i / buckets <= by / tries <= (i + 1) / buckets:
+            return smoothColor(palette[i], palette[i+1], by % (tries // buckets), tries // buckets)
+
+@jit(void(), parallel=True, fastmath=True)
 def bump():
     pixArray = pygame.PixelArray(windowSurface)
-    for x in range(len(pixArray) - 1):
-        for y in range(len(pixArray[0]) -1):
+    for x in prange(len(pixArray) - 1):
+        for y in prange(len(pixArray[0]) -1):
             newcolor = pygame.Color(pixArray[x][y] * 256 + 255) #otherwise it saves it as (0, r, g, b)
             if x == 0 and y == 0:
                 logging.debug(newcolor)
@@ -62,19 +57,21 @@ def bump():
         pygame.display.update()
     pixArray.close()
 
+@jit(parallel=True, fastmath=True)
 def makeFractal(size, fType):
     '''Create a picture of a Mandelbrot. The foreground colour is an offset'''
-    print(f'Making a {fType}')
+    print('Making a', fType)
     pixArray = pygame.PixelArray(windowSurface)
-    global bumpArray
     bumpArray = [[]]
-    for x in range(0, size):
+    for x in prange(0, size):
         if x % (size // 20) == 0:
-            print(f'{round(100 * x / size)}% done.')
-        for y in range(0, size):
+            print(str(round(100 * x / size)), '% done.')
+        for y in prange(0, size):
             z = xyToComplex(x , y , size , center)
             escape = iterEscape(z, fType)
-            colour = smoothColorPalette(escape)
+            colour = pygame.Color(0,0,0,255)
+            if escape != tries:
+                colour.r, colour.g, colour.b, colour.a = smoothColorPalette(escape, len(palette) - 1)
             if x == 0 and y == 0:
                 logging.debug(colour)
             pixArray[x][y] = colour
@@ -85,6 +82,7 @@ def makeFractal(size, fType):
         bumpArray.append([])
     bumpArray.append([0] * (size + 1))
     pixArray.close()
+    return bumpArray
 
 @jit(complex128(int32,int32,int32,complex128), cache=True)
 def xyToComplex(x,y, size, center=complex(0)):
@@ -135,8 +133,7 @@ equation = {'mandelbrot' : lambda z, c : z ** 2 + c,
             'magnet1' : lambda z, c: ((z ** 2 + (c - 1))/(2 * z + (c - 2))) ** 2,
             'magnet2' : lambda z, c : ((z ** 3 + 3 * (c - 1) * z + (c - 1) * (c - 2))
                  /(3 * z ** 2 + 3 * (c - 2) * c + (c - 1) * (c - 2) + 1)) ** 2,
-            'sinh2' : lambda z, c : cmath.sinh(z)**2 + c,
-            'sinh' : lambda z, c : cmath.sinh(z) + c,
+            'sinh' : lambda z, c : cmath.sinh(z)**2 + c,
             }
 
 defaultColour = pygame.Color(255)
@@ -145,8 +142,8 @@ defaultColour.r, defaultColour.g, defaultColour.b = random.sample(range(0,256), 
 parser = argparse.ArgumentParser(description='Make fractals.')
 parser.add_argument('-s', '--size', metavar="255", type=int, choices=range(1,4095), 
     help="Image size.", default='255', nargs='?')
-parser.add_argument('-p', '--palette', metavar="crimson", type=str, nargs="+", 
-    help="foreground colour", default=[defaultColour])
+parser.add_argument('-p', '--palette', metavar="crimson", type=str, nargs="+", default=[defaultColour], 
+    help="If only one colour is specified, a palette will be built for you based on that colour.")
 parser.add_argument('--center', metavar='real,imag', type=complex, default='0+0j', nargs='?', 
     help='a complex number to centre the fractal on. You must specify it like --center="-.1-.1j" \
     with the equal sign or the argparser gets confused.')
@@ -177,8 +174,10 @@ if len(palette) < 2:
     for item in itertools.permutations(palette[0][:3], 3):
         newcolor = pygame.Color(0, 0, 0, 255)
         newcolor.r, newcolor.g, newcolor.b = item[0:3]
-        palette.append(newcolor)
-del palette[0]
+        if max(item) / min(item) < 3: # not enough contrast
+            newcolor[item.index(sorted(item)[1])] = max(item) ^ min(item)
+        if newcolor not in palette:
+            palette.append(newcolor)
 
 logging.debug(palette)
 
@@ -195,7 +194,7 @@ windowSurface.fill(palette[0])
 windowTitle = args.mode.capitalize() + ' : ' + str(center)
 pygame.display.set_caption(windowTitle)
 
-makeFractal(args.size, args.mode)
+bumpArray = makeFractal(args.size, args.mode)
 
 #Run the game loop.
 while True:
@@ -205,7 +204,7 @@ while True:
             sys.exit()
         elif event.type == KEYDOWN:
             if event.key == K_s:
-                filename = args.file + str(center.real) + '+' + str(center.imag) + 'x' + str(zoom) + '.png'
+                filename = args.file + "_" +  str(center.real) + '+' + str(center.imag) + 'i_x' + str(zoom) + '.png'
                 pygame.image.save(windowSurface, filename)
                 print (f'\nImage saved to {filename}.')
             elif event.key == K_b:
@@ -216,5 +215,5 @@ while True:
             windowTitle = args.mode.capitalize() + ' : ' + str(center)
             pygame.display.set_caption(windowTitle)
             zoom = zoom * 2
-            makeFractal(args.size, args.mode)
+            bumpArray = makeFractal(args.size, args.mode)
 
