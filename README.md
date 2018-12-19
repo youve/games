@@ -1,6 +1,19 @@
 # Math Games
 These are some mathematical games that I wrote. Most of them I invented myself.
 
+## Fractals
+
+`fractals.py` supports a bunch of different fractal generated algorithms and colour palettes. It makes pictures like this:
+
+`./fractals.py mandelbrot images/mandelbrot --center="-0.11378702859237537+0.8826781799120236j" --zoom 1048576 --tries 10000 --size 600`
+
+![Mandelbrot](./images/mandelbrot-0.11378702859237537+0.8826781799120236jx1048576.png)
+
+When an image is complete (i.e. it's not currently running something), you can:
+* Left mouse click to recentre on a point and zoom in by a factor of 2.
+* s to save the image. It will be saved as `filename{centerCoordinates}x{zoom}.png` to avoid collisions.
+* b to add bump mapping to the image to create an illusion of 3D texture.
+
 ## Maths Pictures
 
 `mathspictures.py` can create mathematical images like these:
@@ -20,22 +33,6 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 `/mathsPictures.py ulam ulamdark.png --foreground 'blue' --background 'black'`
 
 ![Ulam spiral](./images/ulamdark.png)
-
-### Mandelbrot sets
-
-`./mathsPictures.py mandelbrot mandelbrot4.png --size 500 --center=-1+.3j --tries 32768 --zoom 4 --foreground #033`
-
-![Mandelbrot set](./images/mandelbrot4.png)
-
-./mathsPictures.py mandelbrot mandelbrot7.png -s 500 --center=-1+.3j --tries 65536 --zoom 128 -f crimson
-
-![Mandelbrot set](./images/mandelbrot7.png)
-
-### Burning ship fractal
-
-`./mathsPictures.py --center="-1.617" -t 16384 -z 4096 ship ship2.png -s 600 -f "#006"`
-
-![Burning ship](./images/ship.png)
 
 ## Geek of All Trades
 
