@@ -170,111 +170,7 @@ def divisors(n):
         i += 1
     return divisors
 
-def mandelbrot(size):
-    '''Create a picture of a Mandelbrot. The foreground colour is an offset'''
-    print('Making a Mandelbrot')
-    im = Image.new('RGBA', (size,size), background)
-    for x in range(0,size):
-        if x%(size//20) == 0:
-            print(f'{round(100*x/size)}% done.')
-        for y in range(0,size):
-            z = xyToComplex(x,y,size,center)
-            escape = mandelbrotEscape(z)
-            # RGB allows for 16**6 colours and escape is a number between 0 and tries
-            foregroundDec = foreground[0]*256**2 + foreground[1]*256 + foreground[2]
-            baseColourDec = escape*16**6//args.tries
-            colour = '#{:06X}'.format((foregroundDec + baseColourDec)%16**6)
-            colour = ImageColor.getcolor(colour, 'RGBA')
-            im.putpixel((x, y), colour)
-    im.save(args.file)
-    im.show()
-    print (f'\nImage saved to {args.file}.')
-
-@jit(complex128(int32,int32,int32,complex128), cache=True)
-def xyToComplex(x,y, size, center=complex(0)):
-    '''convert x y coordinates that have 0,0 at the top left to imaginary coordinates
-    centred around the point specified with the --center flag. Returns a complex number'''
-    zoom=args.zoom
-    zReal, zImag = center.real, center.imag
-    if x > size/2: #right half
-        #suppose x is 180 and the image is 240 pixels wide
-        #take x, subtract half the image so that 0 now represents the middle. 
-        #now we have a number like 60.
-        #divide by the size of the quadrant, which is size/2
-        #getting 0.5 for this x because we're halfway across the quadrant
-        #and also then divide by zoom to zoom in that much
-        zReal += (x - size/2)/(zoom*size/2)
-    elif x < size/2: #left half
-        zReal -= ((size/2) -x)/(zoom*size/2)
-    if y > size/2: #top half
-        zImag += (y - size/2)/(zoom*size/2)
-    elif y < size/2: #bottom half
-        zImag -= ((size/2) -y)/(zoom*size/2)
-    z = complex(zReal, zImag)
-    if x == 0 and y == 0:
-        print('Top left edge:', z)
-    elif x == size -1 and y == size - 1:
-        print('Bottom right edge: ', z)
-    return z
-
-@jit(int32(complex128), cache=True)
-def mandelbrotEscape(z):
-    '''
-    Convert the complex number to polar coordinates. The r coordinate gives
-    the radius from 0. If that stays less than 2 for many tries, it's probably
-    in the Mandelbrot set. If it ever gets bigger than 2, then squaring it will make it
-    rapidly approach infinity and is definitely not in the Mandelbrot set.
-
-    Return how many tries it took before the number got bigger than 2"
-    '''
-    tries = args.tries
-    newz = z**2 + z
-    bailout = tries
-    while cmath.polar(newz)[0] < 2 and bailout > 0:
-        newz = newz**2 + z
-        bailout = bailout - 1
-    return tries - bailout
-
-@jit(int32(complex128), cache=True)
-def shipEscape(z):
-    '''
-    Convert the complex number to polar coordinates. The r coordinate gives
-    the radius from 0. Almost the same as Mandelbrot except take the absolute value of the 
-    real part and imaginary parts separately before each squaring.
-
-    Return how many tries it took before the number got bigger than 2"
-    '''
-    tries = args.tries
-    newz = complex(abs(z.real), abs(z.imag))**2 + z
-    bailout = tries
-    while cmath.polar(newz)[0] < 2 and bailout > 0:
-        newz = complex(abs(newz.real), abs(newz.imag))**2 + z
-        bailout = bailout - 1
-    return tries - bailout
-
-def ship(size):
-    '''Create a picture of a Burning Ship fractal. The foreground colour is an offset'''
-    print('Burning a Ship.')
-    im = Image.new('RGBA', (size,size), background)
-    for x in range(0,size):
-        if x%(size//20) == 0:
-            print(f'{round(100*x/size)}% done.')
-        for y in range(0,size):
-            z = xyToComplex(x,y,size,center)
-            escape = shipEscape(z)
-            # RGB allows for 16**6 colours and escape is a number between 0 and tries
-            foregroundDec = foreground[0]*256**2 + foreground[1]*256 + foreground[2]
-            baseColourDec = escape*16**6//args.tries
-            colour = '#{:06X}'.format((foregroundDec + baseColourDec)%16**6)
-            colour = ImageColor.getcolor(colour, 'RGBA')
-            im.putpixel((x, y), colour)
-    im.save(args.file)
-    im.show()
-    print (f'\nImage saved to {args.file}.')
-
-modes={'xor' : xor, 'ulam' : ulam, 'mandelbrot' : mandelbrot, 'gradiant' : gradiant, 'ship':ship,
-    'fib' : fib
-}
+modes={'xor' : xor, 'ulam' : ulam, 'gradiant' : gradiant, 'fib' : fib}
 
 parser = argparse.ArgumentParser(description='Make maths pictures.')
 parser.add_argument('-s', '--size', metavar="255", type=int, choices=range(1,4095), 
@@ -283,13 +179,6 @@ parser.add_argument('-f', '--foreground', metavar="mediumpurple", type=str, narg
     help="foreground colour", default="mediumpurple")
 parser.add_argument('-b', '--background', metavar="darkgray", type=str, default="darkgray", 
     help="Background colour", nargs="?")
-parser.add_argument('--center', metavar='real,imag', type=complex, default='0+0j', nargs='?', 
-    help='a complex number to centre the Mandelbrot set on. If you use a negative number, you \
-    must specify it like --center="-.1-.1j" with the equal sign or the argparser gets confused.')
-parser.add_argument('-t', '--tries', metavar=10000, type=int, default=10000, nargs='?',
-    help='how many times to iterate before deciding a number is in the Mandelbrot set. Larger = more accurate, slower')
-parser.add_argument('-z', '--zoom', metavar=.5, type=float, default=.5, nargs='?', 
-    help='how far to zoom in on the Mandelbrot set')
 parser.add_argument('mode', help=', '.join(list(modes.keys())) choices=modes.keys())
 parser.add_argument('file', type=str, metavar='outputFilename.png', help='output file name')
 
