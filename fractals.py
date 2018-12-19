@@ -10,60 +10,34 @@ import logging
 import random
 from numba import jit, int32, complex128
 import sys
+import itertools
 #logging.disable()
 logging.basicConfig(level=logging.DEBUG, format='%(lineno)s - %(asctime)s - %(levelname)s - %(message)s')
 
 #TODO listen for clicks even while building image and respond
 #TODO speed things up by first doing big fuzzy pixels
 
-@jit(int32(int32))
-def divisors(n):
-    '''return the number of divisors a number has'''
-    divisors = 0
-    i = 1
-    while i <= n**(1/2):
-        if n % i == 0:
-            if i*i == n:
-                divisors += 1
-            else:
-                divisors += 2
-        i += 1
-    return divisors
-
 @jit
-def incColour(by):
-    '''return colour''' #better than what I had
-    if by == args.tries:
-        return foreground
-    step = (by * 16 ** 6) // args.tries
-    increment = (step // (256 ** 2), step % (256 ** 2) // 256, step % 256)
-    colour = list(foreground)
-    for i, v in enumerate(increment): #maybe
-        if foreground[i] + increment[i] < 256:
-            colour[i] = foreground[i] + increment[i]
-        else: colour[i] = 255 * 2 - foreground[i] - increment[i]
-    return tuple(colour)
-
-@jit
-def nColor(by):
-    '''return color''' # sometimes, but not usually pretty; also reduces available colours to 256.
-    if by == args.tries:
-        return foreground
-    r = (foreground[0] + 256*(by/args.tries))%256
-    g = (foreground[1] + 256*(by/args.tries))%256
-    b = (foreground[2] + 256*(by/args.tries))%256
-    return (r,g,b)
-
-@jit
-def smoothColor(by):
+def smoothColor(colora, colorb, by, total):
     '''return colour'''
     colour = pygame.Color(0,0,0,255)
-    if by == args.tries:
-        return colour
-    for i, v in enumerate(foreground):
-        colour[i] = int((v * (args.tries - by) / args.tries) + (background[i] * by / args.tries))
+    for i, v in enumerate(colora):
+        colour[i] = int((v * (total - by) / total) + (colorb[i] * by / total))
     colour.a = 255
     return colour
+
+@jit 
+def smoothColorPalette(by):
+    '''determine which two colours to smooth between'''
+    colour = pygame.Color(0,0,0,255)
+    if by == tries:
+        return colour
+    for i in range(len(palette) -1):
+        if i / (len(palette) - 1) <= by/tries <= (i + 1) / (len(palette) - 1):
+            return smoothColor(palette[i], palette[i+1], 
+                        by % (tries // (len(palette) - 1 )), 
+                        tries // (len(palette) - 1))
+    #logging.debug(f'by: {by}, tries:{tries}, by/tries: {by/tries}')
 
 @jit
 def bump():
@@ -73,9 +47,9 @@ def bump():
             newcolor = pygame.Color(pixArray[x][y] * 256 + 255) #otherwise it saves it as (0, r, g, b)
             if x == 0 and y == 0:
                 logging.debug(newcolor)
-            newcolor.r = max(min(int(newcolor.r + 256*((bumpArray[x+1][y+1] - bumpArray[x][y]) * 2)), 255), 0)
-            newcolor.g = max(min(int(newcolor.g + 256*((bumpArray[x+1][y+1] - bumpArray[x][y]) * 2)), 255), 0)
-            newcolor.b = max(min(int(newcolor.b + 256*((bumpArray[x+1][y+1] - bumpArray[x][y]) * 2)), 255), 0)
+            newcolor.r = max(min(int(newcolor.r + 256 * ((bumpArray[x+1][y+1] - bumpArray[x][y]) * 2)), 255), 0)
+            newcolor.g = max(min(int(newcolor.g + 256 * ((bumpArray[x+1][y+1] - bumpArray[x][y]) * 2)), 255), 0)
+            newcolor.b = max(min(int(newcolor.b + 256 * ((bumpArray[x+1][y+1] - bumpArray[x][y]) * 2)), 255), 0)
             newcolor.a = 255
             if x == 0 and y == 0:
                 logging.debug(newcolor)
@@ -87,39 +61,6 @@ def bump():
                 logging.debug(pixArray[x][y])
         pygame.display.update()
     pixArray.close()
-
-@jit
-def anotherColor(by):
-    '''return color''' # doesn't work
-    if by == args.tries:
-        return foreground
-    bright = False
-    step = (by*16**6)//args.tries
-    if sum(foreground[:3])/3 >= 128: # bright
-        bright = True
-    r, g, b = 0, 0, 0
-    for k, v in enumerate([r, g, b]):
-        assignedMax = False
-        assignedMin = False
-        if bright: # in practice this usually sets r, g, b to 0 🙁
-            if foreground[k] == min(foreground[:3]) and not assignedMin:
-                v = min(0, foreground[k] - (step // (256 ** 2)))
-                assignedMin = True
-            elif foreground[k] == max(foreground[:3]) and not assignedMax:
-                v = min(0, foreground[k] - (step % 256))
-                assignedMax = True
-            else:
-                v = min(0, foreground[k] - (step % (256 ** 2) // 256))
-        else: # in practice, this usually sets r, g, b to 255 🙁
-            if foreground[k] == max(foreground[:3]) and not assignedMax:
-                v = max(0, foreground[k] + (step // (256 ** 2)))
-                assignedMax = True
-            elif foreground[k] == min(foreground[:3]) and not assignedMin:
-                v = max(0, foreground[k] + (step % 256))
-                assignedMin = True
-            else:
-                v = max(0, foreground[k] + (step % (256 ** 2) // 256))
-    return tuple((r, g, b))
 
 def makeFractal(size, fType):
     '''Create a picture of a Mandelbrot. The foreground colour is an offset'''
@@ -133,14 +74,13 @@ def makeFractal(size, fType):
         for y in range(0, size):
             z = xyToComplex(x , y , size , center)
             escape = iterEscape(z, fType)
-            colour = smoothColor(escape)
+            colour = smoothColorPalette(escape)
             if x == 0 and y == 0:
                 logging.debug(colour)
             pixArray[x][y] = colour
             if x == 0 and y == 0:
                 logging.debug(pixArray[x][y])
             bumpArray[x].append(sum(colour[:3])/(256*3))
-            #bumpArray[x].append(escape / args.tries)
         pygame.display.update()
         bumpArray.append([])
     bumpArray.append([0] * (size + 1))
@@ -182,7 +122,6 @@ def iterEscape(c, fType):
 
     Return how many tries it took before the number got bigger than 2"
     '''
-    tries = args.tries
     z = equation[fType](c, c)
     bailout = tries
     while cmath.polar(z)[0] < 2 and bailout > 0:
@@ -196,19 +135,18 @@ equation = {'mandelbrot' : lambda z, c : z ** 2 + c,
             'magnet1' : lambda z, c: ((z ** 2 + (c - 1))/(2 * z + (c - 2))) ** 2,
             'magnet2' : lambda z, c : ((z ** 3 + 3 * (c - 1) * z + (c - 1) * (c - 2))
                  /(3 * z ** 2 + 3 * (c - 2) * c + (c - 1) * (c - 2) + 1)) ** 2,
-            'sinh' : lambda z, c : cmath.sinh(z)**2 + c}
+            'sinh2' : lambda z, c : cmath.sinh(z)**2 + c,
+            'sinh' : lambda z, c : cmath.sinh(z) + c,
+            }
 
-fg = pygame.Color(255)
-fg.r, fg.g, fg.b = random.sample(range(0,256), k=3)
-bg = pygame.Color(255 ^ fg[0], 255 ^ fg[1], 255 ^ fg[2])
+defaultColour = pygame.Color(255)
+defaultColour.r, defaultColour.g, defaultColour.b = random.sample(range(0,256), k=3)
 
 parser = argparse.ArgumentParser(description='Make fractals.')
 parser.add_argument('-s', '--size', metavar="255", type=int, choices=range(1,4095), 
     help="Image size.", default='255', nargs='?')
-parser.add_argument('-f', '--foreground', metavar="crimson", type=str, nargs="?", 
-    help="foreground colour", default=(fg))
-parser.add_argument('-b', '--background', metavar="#003", type=str, nargs="?", 
-    help="background colour", default=(bg))
+parser.add_argument('-p', '--palette', metavar="crimson", type=str, nargs="+", 
+    help="foreground colour", default=[defaultColour])
 parser.add_argument('--center', metavar='real,imag', type=complex, default='0+0j', nargs='?', 
     help='a complex number to centre the fractal on. You must specify it like --center="-.1-.1j" \
     with the equal sign or the argparser gets confused.')
@@ -222,26 +160,27 @@ parser.add_argument('file', type=str, metavar='outputFilename', help='output fil
 args = parser.parse_args()
 center = 0j
 zoom = args.zoom
+tries = args.tries
 
-#foreground, background = None, None
+palette = []
+for colour in args.palette:
+    if not isinstance(colour, pygame.Color):
+        try: 
+            palette.append(pygame.Color(colour))
+        except ValueError:
+            palette.append(defaultColour)
+            print(f'{colour} isn\'t a valid colour. Using {defaultColour} instead.')
+    else:
+        palette.append(colour)
 
-if not isinstance(args.foreground, pygame.Color):
-    try: 
-        foreground = pygame.Color(args.foreground)
-    except ValueError:
-        foreground = fg
-        print(f'{args.foreground} isn\'t a valid colour. Using {fg} instead.')
-else:
-    foreground = args.foreground
+if len(palette) < 2:
+    for item in itertools.permutations(palette[0][:3], 3):
+        newcolor = pygame.Color(0, 0, 0, 255)
+        newcolor.r, newcolor.g, newcolor.b = item[0:3]
+        palette.append(newcolor)
+del palette[0]
 
-if not isinstance(args.background, pygame.Color):
-    try:
-        background = pygame.Color(args.background)
-    except ValueError:
-        background = bg
-        print(f'{args.background} isn\'t a valid colour. Using {bg} instead.')
-else:
-    background = args.background
+logging.debug(palette)
 
 try:
     center = complex(args.center)
@@ -252,7 +191,7 @@ except ValueError:
 #set up pygame
 pygame.init()
 windowSurface = pygame.display.set_mode((args.size, args.size))
-windowSurface.fill(foreground)
+windowSurface.fill(palette[0])
 windowTitle = args.mode.capitalize() + ' : ' + str(center)
 pygame.display.set_caption(windowTitle)
 
