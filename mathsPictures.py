@@ -290,7 +290,7 @@ parser.add_argument('-t', '--tries', metavar=10000, type=int, default=10000, nar
     help='how many times to iterate before deciding a number is in the Mandelbrot set. Larger = more accurate, slower')
 parser.add_argument('-z', '--zoom', metavar=.5, type=float, default=.5, nargs='?', 
     help='how far to zoom in on the Mandelbrot set')
-parser.add_argument('mode', help='ulam, xor, mandelbrot', choices=modes.keys())
+parser.add_argument('mode', help=', '.join(list(modes.keys())) choices=modes.keys())
 parser.add_argument('file', type=str, metavar='outputFilename.png', help='output file name')
 
 args = parser.parse_args()
