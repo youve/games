@@ -7,7 +7,7 @@ These are some mathematical games that I wrote. Most of them I invented myself.
 
 `./fractals.py mandelbrot images/mandelbrot --center="-0.11378702859237537+0.8826781799120236j" --zoom 1048576 --tries 10000 --size 600`
 
-![Mandelbrot](./images/mandelbrot-0.11378702859237537+0.8826781799120236jx1048576.png)
+![Mandelbrot](./images/mandelbrot-0.11378702859237537%2B0.8826781799120236jx1048576.0.png)
 
 When an image is complete (i.e. it's not currently running something), you can:
 * Left mouse click to recentre on a point and zoom in by a factor of 2.
