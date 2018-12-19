@@ -150,7 +150,7 @@ parser.add_argument('-p', '--palette', metavar="crimson", type=str, nargs="+",
 parser.add_argument('--center', metavar='real,imag', type=complex, default='0+0j', nargs='?', 
     help='a complex number to centre the fractal on. You must specify it like --center="-.1-.1j" \
     with the equal sign or the argparser gets confused.')
-parser.add_argument('-t', '--tries', metavar=255, type=int, default=2048, nargs='?',
+parser.add_argument('-t', '--tries', metavar=2048, type=int, default=2048, nargs='?',
     help='how many times to iterate. Default should be fine. Reduce it if it\'s slow.')
 parser.add_argument('-z', '--zoom', metavar=.5, type=float, default=.5, nargs='?', 
     help='how far to zoom in on the fractal')
@@ -205,7 +205,7 @@ while True:
             sys.exit()
         elif event.type == KEYDOWN:
             if event.key == K_s:
-                filename = args.file + str(center) + 'x' + str(zoom) + '.png'
+                filename = args.file + str(center.real) + '+' + str(center.imag) + 'x' + str(zoom) + '.png'
                 pygame.image.save(windowSurface, filename)
                 print (f'\nImage saved to {filename}.')
             elif event.key == K_b:
