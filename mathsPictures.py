@@ -27,6 +27,28 @@ def xor(size):
     im.show()
     print (f'\nImage saved to {args.file}.')
 
+def andImage(size):
+    print('Making an AND')
+    im = Image.new('RGBA', (size,size), background)
+    for x in range(0,size):
+        for y in range(0,size):
+            im.putpixel((x, y), (round(foreground[0]/255*(x%256&y%256)), round(foreground[1]/255*(x%256&y%256)), round(foreground[2]/255*(x%256&y%266))))
+    im.save(args.file)
+    im.show()
+    print (f'\nImage saved to {args.file}.')
+
+def sierpinski(size):
+    print('Making a sierpinski')
+    im = Image.new('RGBA', (size,size), background)
+    for x in range(0,size):
+        for y in range(0,size):
+            if x & y == 0:
+                im.putpixel((x, y), foreground)
+    im.save(args.file)
+    im.show()
+    print (f'\nImage saved to {args.file}.')
+
+
 def gradiant(size):
     '''Produces wobbly lines varying in colour very slowly'''
     print('Making gradiant')
@@ -184,7 +206,7 @@ def divisors(n):
         i += 1
     return divisors
 
-modes={'xor' : xor, 'ulam' : ulam, 'gradiant' : gradiant, 'fib' : fib}
+modes={'xor' : xor, 'ulam' : ulam, 'gradiant' : gradiant, 'fib' : fib, 'and' : andImage, 'sierpinski' : sierpinski}
 
 parser = argparse.ArgumentParser(description='Make maths pictures.')
 parser.add_argument('-s', '--size', metavar="255", type=int, choices=range(1,4095), 
@@ -193,7 +215,7 @@ parser.add_argument('-f', '--foreground', metavar="mediumpurple", type=str, narg
     help="foreground colour", default="mediumpurple")
 parser.add_argument('-b', '--background', metavar="darkgray", type=str, default="darkgray", 
     help="Background colour", nargs="?")
-parser.add_argument('mode', help=', '.join(list(modes.keys())) choices=modes.keys())
+parser.add_argument('mode', help=', '.join(list(modes.keys())), choices=modes.keys())
 parser.add_argument('file', type=str, metavar='outputFilename.png', help='output file name')
 
 args = parser.parse_args()
@@ -208,10 +230,5 @@ try:
 except ValueError:
     print(f'{args.background} isn\'t a valid colour. Using darkgray instead.')
     background = ImageColor.getcolor('darkgray', 'RGBA')
-try:
-    center = complex(args.center)
-except ValueError:
-    print(f'{args.center} isn\'t a valid complex number. Using 0+0j instead')
-    center = 0j
 
 modes[args.mode](args.size)
