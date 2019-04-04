@@ -35,21 +35,21 @@ magicPotions = ['Royal Purple', 'Cupid', 'Shimmer', 'Fairy', 'Floral',
     'Frost', 'Icy Snow', 'Rose Quartz', 'Celestial']
 petOrMount = ['Pet', 'Mount']
 
-today = datetime.datetime.now().strftime('%A %e')
+today = datetime.datetime.now().strftime('**%A %e')
 if today.endswith('1'):
-    today = today + datetime.datetime.now().strftime('st of %B:')
+    today = today + datetime.datetime.now().strftime('st of %B:**\n')
 elif today.endswith('2'):
-    today = today + datetime.datetime.now().strftime('nd of %B:')
+    today = today + datetime.datetime.now().strftime('nd of %B:**\n')
 elif today.endswith('3'):
-    today = today + datetime.datetime.now().strftime('rd of %B:')
+    today = today + datetime.datetime.now().strftime('rd of %B:**\n')
 else:
-    today = today + datetime.datetime.now().strftime('th of %B:')
+    today = today + datetime.datetime.now().strftime('th of %B:**\n')
 
 print(today)
 
-print("Demonic beast:", random.choice(standardColours),
+print("**Demonic beast:", random.choice(standardColours),
     random.choice(standardPets),
-    random.choice(petOrMount))
+    random.choice(petOrMount), '**\n')
 
 angelType = random.choice(specialPets + specialMounts + questPets + standardPets)
 angelSize = "(pet or mount!)"
@@ -64,4 +64,4 @@ else:
     elif angelType not in specialMounts:
         angelSize = "(Pet!)"
 
-print("Angelic beast:", angelColor, angelType, angelSize)
+print("**Angelic beast:", angelColor, angelType, angelSize, '**')
